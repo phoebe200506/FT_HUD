@@ -7,6 +7,12 @@
 #include "Blueprint/UserWidget.h"
 #include "CannonCharacter.generated.h"
 
+class UInputComponent;
+class UCameraComponent;
+class UInputAction;
+class UInputMappingContext;
+struct FInputActionValue;
+
 UENUM(BlueprintType)
 enum class ShootingState : uint8 {
 	Power UMETA(DisplayName = "POWER"),
@@ -19,6 +25,13 @@ class FT_HUD_API ACannonCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+	/** camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* FirstPersonCameraComponent;
+
+	/** Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InputAction;
 public:
 	// Sets default values for this character's properties
 	ACannonCharacter();

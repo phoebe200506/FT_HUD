@@ -2,13 +2,26 @@
 
 
 #include "CannonCharacter.h"
-
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputActionValue.h"
+#include "Engine/LocalPlayer.h"
 // Sets default values
 ACannonCharacter::ACannonCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// create a capsule component and set it as the root component
+	// Set size for collision capsule
+	GetCapsuleComponent()->InitCapsuleSize(1.f, 1.f);
+	// Create a CameraComponent	
+	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
+	FirstPersonCameraComponent->SetRelativeLocation(FVector(-20.f, 0.f, 0.f)); // Position the camera
+	FirstPersonCameraComponent->bUsePawnControlRotation = false; // we will control the rotation of the camera ourselves
 }
 
 // Called when the game starts or when spawned
