@@ -25,7 +25,7 @@ AFT_HUDProjectile::AFT_HUDProjectile()
 	ProjectileMovement->InitialSpeed = 0;
 	ProjectileMovement->MaxSpeed = 500000.f;
 	ProjectileMovement->bRotationFollowsVelocity = false;
-	ProjectileMovement->bShouldBounce = false;
+	ProjectileMovement->bShouldBounce = true;
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 0.0f; // 0 is forever!

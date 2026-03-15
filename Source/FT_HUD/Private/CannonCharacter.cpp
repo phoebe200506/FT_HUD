@@ -132,17 +132,15 @@ void ACannonCharacter::Fire()
 	UWorld* World = GetWorld();
 	if (!World) { return; }
 
-	// Use actor’s current yaw so the cannon shoots where you face.
-	const FRotator ActorRot = GetActorRotation();
-	const float Yaw = ActorRot.Yaw;
-
-	const FRotator SpawnRotation(angle, Yaw, 0.f);
-	const FVector SpawnLocation = GetActorLocation();
+	const FRotator CamRot = GetControlRotation();
+	const FRotator SpawnRotation(-angle, CamRot.Yaw, 0.f);
+	const FVector CameraLoc = GetActorLocation() + FVector(0, 0, 50.f);
+	const FVector SpawnLocation = CameraLoc + SpawnRotation.RotateVector(FVector(100.f, 0.f, 0.f));
 
 	FActorSpawnParameters Params;
-	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	Params.Owner = this;
-	Params.Instigator = this;
+	Params.Instigator = GetInstigator();
 
 	AActor* Projectile = World->SpawnActor<AActor>(ProjectileClass, SpawnLocation, SpawnRotation, Params);
 	if (!Projectile)
@@ -151,11 +149,20 @@ void ACannonCharacter::Fire()
 		return;
 	}
 
-	// Compute initial velocity from angle + power
-	const FVector FireDir = SpawnRotation.Vector();  // get the forward vector
-	const FVector InitialVelocity = FireDir * power; // Power is initial speed (units/sec)
+	const float MinSpeed = 1500.f; // adjust unreal use cm so you want some off here as 960cm is gravity
+	const float MaxSpeed = 6000.f; 
+	const float LaunchSpeed = FMath::GetMappedRangeValueClamped(
+		FVector2D(0.f, 100.f), FVector2D(MinSpeed, MaxSpeed),
+		FMath::Clamp(power, 0.f, 100.f)
+	);
+
+	const FVector FireDir = SpawnRotation.Vector();
 	if (UProjectileMovementComponent* Move = Projectile->FindComponentByClass<UProjectileMovementComponent>())
 	{
-		Move->Velocity = InitialVelocity;
+		Move->Velocity = FireDir * LaunchSpeed;
+		Move->InitialSpeed = LaunchSpeed;
+		Move->MaxSpeed = FMath::Max(Move->MaxSpeed, LaunchSpeed);
+		Move->bRotationFollowsVelocity = true;  
+		// Move->ProjectileGravityScale = 1.f;                 // you coudl adjust gravity if you wanted
 	}
 }
