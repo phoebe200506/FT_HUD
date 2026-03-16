@@ -92,14 +92,16 @@ void ACannonCharacter::ProgressState()
 		UE_LOG(LogTemp, Warning, TEXT("Angle select"));
 		break;
 	case ShootingState::Angle:
-		CurrentState = ShootingState::Angle;
 		UE_LOG(LogTemp, Warning, TEXT("FIRE THE WEAPON"));
 		CurrentState = ShootingState::Shot;
 		Fire();
 		break;
 	case ShootingState::Shot:
 		// pew pew
-		UE_LOG(LogTemp, Warning, TEXT("Wait!"));
+		UE_LOG(LogTemp, Warning, TEXT("Switching back to power"));
+		CurrentState = ShootingState::Power;
+		power = 0;
+		angle = 0;
 		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("WHY YOU MESSING WITH THE ENUMS!"));
@@ -113,7 +115,7 @@ void ACannonCharacter::ProgressState()
 void ACannonCharacter::UpdateValue(float* value, float DeltaTime)
 {
 	// the *value means dereference 
-	if (*value < 0 || *value > 90)
+	if (*value < 0 || *value > 30)
 	{
 		// flip speed from positive to negative
 		speed = -speed;
